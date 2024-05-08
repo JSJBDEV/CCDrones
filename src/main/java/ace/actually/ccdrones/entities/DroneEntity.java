@@ -151,7 +151,7 @@ public class DroneEntity extends Mob {
             DroneAPI api = new DroneAPI(this);
             computer.addAPI(api);
 
-            shouldMakeBoot=true;
+            //shouldMakeBoot=true;
 
             computer.turnOn();
 
