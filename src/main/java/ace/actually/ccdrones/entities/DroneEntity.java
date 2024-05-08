@@ -5,16 +5,25 @@ import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.computer.core.ServerContext;
 import dan200.computercraft.shared.config.Config;
+import dan200.computercraft.shared.network.container.ComputerContainerData;
 import dan200.computercraft.shared.util.IDAssigner;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -41,7 +50,6 @@ public class DroneEntity extends Mob {
                 DroneAPI.initDrive(computer);
                 shouldMakeBoot=false;
             }
-            //System.out.println("timed out yet: "+computer.hasTimedOut());
 
 
         }
@@ -55,7 +63,6 @@ public class DroneEntity extends Mob {
 
     }
 
-
     @Override
     public void addAdditionalSaveData(CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
@@ -66,8 +73,6 @@ public class DroneEntity extends Mob {
     protected void defineSynchedData() {
         super.defineSynchedData();
         CompoundTag a = new CompoundTag();
-        //a.putUUID("computerUUID",UUID.);
-        //a.putInt("computerID",-1);
         entityData.define(EXTRA,a.copy());
     }
 
@@ -156,4 +161,6 @@ public class DroneEntity extends Mob {
         return computer;
 
     }
+
+
 }
