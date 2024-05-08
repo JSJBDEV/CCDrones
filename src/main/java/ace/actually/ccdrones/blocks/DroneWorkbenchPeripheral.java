@@ -20,6 +20,7 @@ import dan200.computercraft.shared.peripheral.diskdrive.DiskDrivePeripheral;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import dan200.computercraft.shared.turtle.apis.TurtleAPI;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DroneWorkbenchPeripheral implements IPeripheral {
@@ -122,6 +124,25 @@ public class DroneWorkbenchPeripheral implements IPeripheral {
     public final MethodResult debug()
     {
         return MethodResult.of(VanillaDetailRegistries.BLOCK_IN_WORLD.getDetails(new BlockReference(blockEntity.getLevel(),blockEntity.getBlockPos().below())));
+    }
+
+
+    @LuaFunction
+    public final MethodResult survey()
+    {
+        Map<String,Map<String,Object>> found = new HashMap<>();
+        for (int i = -5; i < 5; i++) {
+            for (int j = -5; j < 5; j++) {
+                for (int k = -5; k < 5; k++) {
+                    if(blockEntity.getLevel().getBlockState(blockEntity.getBlockPos().offset(i,j,k)).is(BlockTags.PARROTS_SPAWNABLE_ON))
+                    {
+
+                        found.put(i+","+j+","+k,VanillaDetailRegistries.BLOCK_IN_WORLD.getBasicDetails(new BlockReference(blockEntity.getLevel(),blockEntity.getBlockPos().offset(i,j,k))));
+                    }
+                }
+            }
+        }
+        return MethodResult.of(found);
     }
 
 

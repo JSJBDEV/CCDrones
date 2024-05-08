@@ -17,6 +17,7 @@ import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import dan200.computercraft.shared.turtle.upgrades.CraftingTablePeripheral;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
@@ -24,6 +25,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DroneAPI implements ILuaAPI {
     DroneEntity drone;
@@ -81,6 +86,15 @@ public class DroneAPI implements ILuaAPI {
     }
     @LuaFunction
     public final float rotation() {return drone.yRotO;}
+    @LuaFunction
+    public final MethodResult lookBack()
+    {
+        ClipContext context = new ClipContext(drone.getOnPos().getCenter(),drone.getOnPos().getCenter().add(drone.getForward().multiply(-3,-3,-3)), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY,drone);
+        BlockHitResult result = drone.level().clip(context);
+
+        //System.out.println(result.getBlockPos()+" "+drone.level().getBlockState(result.getBlockPos()));
+        return MethodResult.of(VanillaDetailRegistries.BLOCK_IN_WORLD.getDetails(new BlockReference(drone.level(),result.getBlockPos())));
+    }
 
 
     public static void initDrive(ServerComputer computer)
