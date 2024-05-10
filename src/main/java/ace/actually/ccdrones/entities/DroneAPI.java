@@ -52,6 +52,10 @@ public class DroneAPI implements ILuaAPI {
     public final void engineOn(boolean on)
     {
         drone.setEngineOn(on);
+        if(!on)
+        {
+            drone.setDeltaMovement(Vec3.ZERO);
+        }
     }
     @LuaFunction
     public final void hoverOn(boolean on)
@@ -94,6 +98,26 @@ public class DroneAPI implements ILuaAPI {
 
         //System.out.println(result.getBlockPos()+" "+drone.level().getBlockState(result.getBlockPos()));
         return MethodResult.of(VanillaDetailRegistries.BLOCK_IN_WORLD.getDetails(new BlockReference(drone.level(),result.getBlockPos())));
+    }
+
+    @LuaFunction
+    public final void breakForward()
+    {
+        ClipContext context = new ClipContext(drone.getOnPos().getCenter(),drone.getOnPos().getCenter().add(drone.getForward().multiply(3,3,3)), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY,drone);
+        BlockHitResult result = drone.level().clip(context);
+
+        drone.level().destroyBlock(result.getBlockPos(),true,drone);
+    }
+
+    @LuaFunction(mainThread = true)
+    public final void pickupBlock()
+    {
+        drone.setCarrying(drone.getOnPos().below());
+    }
+    @LuaFunction(mainThread = true)
+    public final void dropBlock()
+    {
+        drone.dropCarrying(drone.getOnPos().below());
     }
 
 

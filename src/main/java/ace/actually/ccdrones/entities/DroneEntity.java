@@ -7,11 +7,18 @@ import dan200.computercraft.shared.computer.core.ServerContext;
 import dan200.computercraft.shared.config.Config;
 import dan200.computercraft.shared.network.container.ComputerContainerData;
 import dan200.computercraft.shared.util.IDAssigner;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Clearable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -22,6 +29,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,7 +41,7 @@ public class DroneEntity extends Mob {
 
     private boolean shouldMakeBoot = false;
 
-    private static final EntityDataAccessor<CompoundTag> EXTRA = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.COMPOUND_TAG);
+    public static final EntityDataAccessor<CompoundTag> EXTRA = SynchedEntityData.defineId(DroneEntity.class, EntityDataSerializers.COMPOUND_TAG);
     public DroneEntity(EntityType<DroneEntity> e,Level level) {
         super(e, level);
 
@@ -86,6 +96,57 @@ public class DroneEntity extends Mob {
         CompoundTag tag = entityData.get(EXTRA);
         tag.putInt("computerID",computerID);
         entityData.set(EXTRA,tag);
+
+    }
+
+    public void setCarrying(BlockPos pos) {
+        CompoundTag tag = entityData.get(EXTRA);
+
+        System.out.println("picking up!");
+        BlockState state = level().getBlockState(pos);
+        BlockEntity entity = level().getBlockEntity(pos);
+
+        CompoundTag stateTag = NbtUtils.writeBlockState(state);
+        tag.put("carryingState",stateTag);
+
+        if(entity!=null)
+        {
+            CompoundTag entityTag = entity.saveWithFullMetadata();
+            tag.put("carryingEntity",entityTag);
+            Clearable.tryClear(entity);
+        }
+
+
+        entityData.set(EXTRA,tag,true);
+        level().setBlock(pos,Blocks.AIR.defaultBlockState(),2);
+    }
+
+    public void dropCarrying(BlockPos pos)
+    {
+        CompoundTag tag = entityData.get(EXTRA);
+        if(tag.contains("carryingState"))
+        {
+            System.out.println("dropping!");
+            BlockState state = NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(),tag.getCompound("carryingState"));
+            level().setBlock(pos,state,2);
+            if(tag.contains("carryingEntity"))
+            {
+                BlockEntity entity = BlockEntity.loadStatic(pos,state,tag.getCompound("carryingEntity"));
+                level().setBlockEntity(entity);
+                tag.remove("carryingEntity");
+            }
+            tag.remove("carryingState");
+            entityData.set(EXTRA,tag,true);
+        }
+
+
+
+    }
+
+    public boolean isCarryingBlock()
+    {
+        CompoundTag tag = entityData.get(EXTRA);
+        return tag.contains("carryingState");
     }
 
     public void setComputerUUID(UUID computerUUID) {
@@ -161,6 +222,7 @@ public class DroneEntity extends Mob {
         return computer;
 
     }
+
 
 
 }
