@@ -16,9 +16,15 @@ import dan200.computercraft.shared.computer.blocks.ComputerBlock;
 import dan200.computercraft.shared.computer.core.ServerComputer;
 import dan200.computercraft.shared.peripheral.modem.ModemPeripheral;
 import dan200.computercraft.shared.turtle.upgrades.CraftingTablePeripheral;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 import java.io.IOException;
@@ -112,12 +118,40 @@ public class DroneAPI implements ILuaAPI {
     @LuaFunction(mainThread = true)
     public final void pickupBlock()
     {
-        drone.setCarrying(drone.getOnPos().below());
+        ClipContext context = new ClipContext(drone.getOnPos().getCenter(),drone.getOnPos().getCenter().add(0,-2,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY,drone);
+        BlockHitResult result = drone.level().clip(context);
+
+        drone.setCarrying(result.getBlockPos());
     }
     @LuaFunction(mainThread = true)
     public final void dropBlock()
     {
-        drone.dropCarrying(drone.getOnPos().below());
+        ClipContext context = new ClipContext(drone.getOnPos().getCenter(),drone.getOnPos().getCenter().add(0,-2,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY,drone);
+        BlockHitResult result = drone.level().clip(context);
+
+        drone.dropCarrying(result.getBlockPos().above());
+    }
+
+    @LuaFunction(mainThread = true)
+    public final void pickUpEntity()
+    {
+        ClipContext context = new ClipContext(drone.getOnPos().getCenter(),drone.getOnPos().getCenter().add(0,-3,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY,drone);
+        BlockHitResult result = drone.level().clip(context);
+        List<Entity> targets = drone.level().getEntitiesOfClass(Entity.class,new AABB(result.getBlockPos().offset(-2,-2,-2),result.getBlockPos().offset(2,2,2)));
+        if(!targets.isEmpty())
+        {
+            targets.get(drone.getRandom().nextInt(targets.size())).startRiding(drone);
+        }
+
+    }
+
+    @LuaFunction(mainThread = true)
+    public final void dropEntity()
+    {
+        if(!drone.getPassengers().isEmpty())
+        {
+            drone.ejectPassengers();
+        }
     }
 
 

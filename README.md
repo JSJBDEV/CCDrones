@@ -12,6 +12,8 @@ currently drones can:
 - turn the drones hover function on (`drone.hoverOn(true)`)
 - pick up blocks (and keep there data) below (`drone.pickupBlock()`)
 - drop the block (`drone.dropBlock()`)
+- pick up entities below (`drone.pickUpEntity()`)
+- drop the entity below (`drone.dropEntity()`)
 
 ## Programming
 using the Drone Workbench as a peripheral you can use two commands

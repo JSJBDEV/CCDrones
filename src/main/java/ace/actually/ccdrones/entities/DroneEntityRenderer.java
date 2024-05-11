@@ -43,6 +43,15 @@ public class DroneEntityRenderer extends MobRenderer<DroneEntity,DroneEntityMode
             poseStack.popPose();
         }
 
+        if(!mob.getPassengers().isEmpty())
+        {
+            poseStack.pushPose();
+            poseStack.translate(-0.5,-1,-0.5);
+            Minecraft.getInstance().getBlockRenderer().renderSingleBlock(Blocks.CHAIN.defaultBlockState(),poseStack,multiBufferSource,i, OverlayTexture.NO_OVERLAY);
+            poseStack.popPose();
+        }
+
+
     }
 
     @Override
