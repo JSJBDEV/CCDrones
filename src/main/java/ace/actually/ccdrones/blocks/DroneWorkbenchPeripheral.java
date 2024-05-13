@@ -1,5 +1,6 @@
 package ace.actually.ccdrones.blocks;
 
+import ace.actually.ccdrones.CCDrones;
 import ace.actually.ccdrones.entities.DroneAPI;
 import ace.actually.ccdrones.entities.DroneEntity;
 import dan200.computercraft.api.detail.BlockReference;
@@ -134,9 +135,8 @@ public class DroneWorkbenchPeripheral implements IPeripheral {
         for (int i = -5; i < 5; i++) {
             for (int j = -5; j < 5; j++) {
                 for (int k = -5; k < 5; k++) {
-                    if(blockEntity.getLevel().getBlockState(blockEntity.getBlockPos().offset(i,j,k)).is(BlockTags.PARROTS_SPAWNABLE_ON))
+                    if(blockEntity.getLevel().getBlockState(blockEntity.getBlockPos().offset(i,j,k)).is(CCDrones.SURVEYABLE))
                     {
-
                         found.put(i+","+j+","+k,VanillaDetailRegistries.BLOCK_IN_WORLD.getBasicDetails(new BlockReference(blockEntity.getLevel(),blockEntity.getBlockPos().offset(i,j,k))));
                     }
                 }

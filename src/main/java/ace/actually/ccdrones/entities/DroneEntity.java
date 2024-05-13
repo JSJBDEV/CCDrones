@@ -1,5 +1,6 @@
 package ace.actually.ccdrones.entities;
 
+import ace.actually.ccdrones.CCDrones;
 import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.shared.computer.core.ComputerFamily;
 import dan200.computercraft.shared.computer.core.ServerComputer;
@@ -22,9 +23,11 @@ import net.minecraft.world.Clearable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -191,6 +194,14 @@ public class DroneEntity extends Mob {
         }
        return null;
     }
+    public void setAllData(CompoundTag tag)
+    {
+        entityData.set(EXTRA,tag);
+    }
+    public CompoundTag getAllData()
+    {
+        return entityData.get(EXTRA);
+    }
 
 
     private ServerComputer createOrUpkeepComputer()
@@ -223,6 +234,17 @@ public class DroneEntity extends Mob {
 
         return computer;
 
+    }
+
+    @Override
+    protected void dropAllDeathLoot(DamageSource damageSource) {
+        super.dropAllDeathLoot(damageSource);
+        ItemStack stack = new ItemStack(CCDrones.DRONE_ITEM);
+        CompoundTag compoundTag = new CompoundTag();
+        compoundTag.put("extra",getAllData());
+        stack.setTag(compoundTag);
+        ItemEntity entity = new ItemEntity(level(),getX(),getY(),getZ(),stack);
+        level().addFreshEntity(entity);
     }
 
     @Override

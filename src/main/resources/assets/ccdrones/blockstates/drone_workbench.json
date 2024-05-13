@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "ccdrones:block/drone_workbench"
+    }
+  }
+}

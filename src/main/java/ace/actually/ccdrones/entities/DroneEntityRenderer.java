@@ -56,6 +56,6 @@ public class DroneEntityRenderer extends MobRenderer<DroneEntity,DroneEntityMode
 
     @Override
     public ResourceLocation getTextureLocation(DroneEntity entity) {
-        return new ResourceLocation("ccdrones","entity/drone.png");
+        return new ResourceLocation("ccdrones","textures/entity/drone.png");
     }
 }

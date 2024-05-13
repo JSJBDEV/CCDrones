@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "ccdrones:drone_item",
+  "key": {
+    "#": {
+      "item": "minecraft:iron_ingot"
+    },
+    "L": {
+      "item": "minecraft:iron_bars"
+    },
+    "T": {
+      "item": "computercraft:turtle_advanced"
+    }
+  },
+  "pattern": [
+    "L#L",
+    "#T#",
+    "L#L"
+  ],
+  "result": {
+    "item": "ccdrones:drone_item"
+  },
+  "show_notification": true
+}

@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "group": "ccdrones:drone_workbench",
+  "key": {
+    "#": {
+      "item": "minecraft:observer"
+    },
+    "L": {
+      "item": "minecraft:daylight_detector"
+    },
+    "G": {
+      "item": "minecraft:comparator"
+    }
+  },
+  "pattern": [
+    "LGL",
+    "###",
+    " # "
+  ],
+  "result": {
+    "item": "ccdrones:drone_workbench"
+  },
+  "show_notification": true
+}
