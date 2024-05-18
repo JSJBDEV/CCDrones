@@ -5,6 +5,7 @@ currently drones can:
 
 - Go forward (using `drone.engineOn(true)`)
 - Turn (using `drone.left(number)` and `drone.right(number)`)
+- Go up and down (using `drone.up(number)` and `drone.down(number)`)
 - Look forward and back (`drone.lookForward()` `drone.lookBack()`)
 - Mine forward (`drone.breakForward()`)
 - see the Drones rotation (`drone.rotation()`)

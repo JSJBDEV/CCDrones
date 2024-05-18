@@ -1,5 +1,6 @@
 package ace.actually.ccdrones.entities;
 
+import ace.actually.ccdrones.items.DroneUpgradeItem;
 import dan200.computercraft.api.ComputerCraftAPI;
 import dan200.computercraft.api.client.ComputerCraftAPIClient;
 import dan200.computercraft.api.client.FabricComputerCraftAPIClient;
@@ -19,6 +20,7 @@ import dan200.computercraft.shared.turtle.upgrades.CraftingTablePeripheral;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.state.BlockState;
@@ -109,19 +111,27 @@ public class DroneAPI implements ILuaAPI {
     @LuaFunction
     public final void breakForward()
     {
-        ClipContext context = new ClipContext(drone.getOnPos().getCenter(),drone.getOnPos().getCenter().add(drone.getForward().multiply(3,3,3)), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY,drone);
-        BlockHitResult result = drone.level().clip(context);
+        if(drone.hasUpgrade("mine"))
+        {
+            ClipContext context = new ClipContext(drone.getOnPos().getCenter(),drone.getOnPos().getCenter().add(drone.getForward().multiply(3,3,3)), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY,drone);
+            BlockHitResult result = drone.level().clip(context);
 
-        drone.level().destroyBlock(result.getBlockPos(),true,drone);
+            drone.level().destroyBlock(result.getBlockPos(),true,drone);
+        }
+
     }
 
     @LuaFunction(mainThread = true)
     public final void pickupBlock()
     {
-        ClipContext context = new ClipContext(drone.getOnPos().getCenter(),drone.getOnPos().getCenter().add(0,-2,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY,drone);
-        BlockHitResult result = drone.level().clip(context);
+        if(drone.hasUpgrade("carry"))
+        {
+            ClipContext context = new ClipContext(drone.getOnPos().getCenter(),drone.getOnPos().getCenter().add(0,-2,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY,drone);
+            BlockHitResult result = drone.level().clip(context);
 
-        drone.setCarrying(result.getBlockPos());
+            drone.setCarrying(result.getBlockPos());
+        }
+
     }
     @LuaFunction(mainThread = true)
     public final void dropBlock()
@@ -135,12 +145,33 @@ public class DroneAPI implements ILuaAPI {
     @LuaFunction(mainThread = true)
     public final void pickUpEntity()
     {
-        ClipContext context = new ClipContext(drone.getOnPos().getCenter(),drone.getOnPos().getCenter().add(0,-3,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY,drone);
-        BlockHitResult result = drone.level().clip(context);
-        List<Entity> targets = drone.level().getEntitiesOfClass(Entity.class,new AABB(result.getBlockPos().offset(-2,-2,-2),result.getBlockPos().offset(2,2,2)));
+
+        if(drone.hasUpgrade("carry"))
+        {
+            List<Entity> targets = drone.level().getEntitiesOfClass(Entity.class,new AABB(drone.getOnPos().offset(-2,-2,-2),drone.getOnPos().offset(2,0,2)));
+            if(!targets.isEmpty())
+            {
+                targets.get(drone.getRandom().nextInt(targets.size())).startRiding(drone);
+            }
+        }
+
+    }
+
+
+    @LuaFunction(mainThread = true)
+    public final void findUpgrades()
+    {
+
+        List<ItemEntity> targets = drone.level().getEntitiesOfClass(ItemEntity.class,new AABB(drone.getOnPos().offset(-2,-2,-2),drone.getOnPos().offset(2,2,2)));
         if(!targets.isEmpty())
         {
-            targets.get(drone.getRandom().nextInt(targets.size())).startRiding(drone);
+           for(ItemEntity item: targets)
+           {
+               if(item.getItem().getItem() instanceof DroneUpgradeItem droneUpgradeItem)
+               {
+                   drone.addUpgrade(droneUpgradeItem.getUpgrade());
+               }
+           }
         }
 
     }

@@ -12,7 +12,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -158,6 +160,75 @@ public class DroneEntity extends Mob {
         CompoundTag tag = entityData.get(EXTRA);
         tag.putUUID("computerUUID",computerUUID);
         entityData.set(EXTRA,tag);
+    }
+
+
+    public void addUpgrade(String upgrade) {
+        CompoundTag tag = entityData.get(EXTRA);
+
+        ListTag list;
+        if(tag.contains("upgrades"))
+        {
+            list = (ListTag) tag.get("upgrades");
+            list.add(StringTag.valueOf(upgrade));
+        }
+        else
+        {
+            list = new ListTag();
+            list.add(StringTag.valueOf(upgrade));
+        }
+        tag.put("upgrades",list);
+
+        entityData.set(EXTRA,tag);
+    }
+
+    public void removeUpgrades() {
+        CompoundTag tag = entityData.get(EXTRA);
+
+
+        if(tag.contains("upgrades"))
+        {
+            ListTag list = (ListTag) tag.get("upgrades");
+            for (int i = 0; i < list.size(); i++) {
+                String v = list.getString(i);
+                ItemStack stack = new ItemStack(CCDrones.UPGRADE_MAP.get(v));
+                ItemEntity entity = new ItemEntity(level(),getX(),getY(),getZ(),stack);
+                level().addFreshEntity(entity);
+            }
+
+            tag.remove("upgrades");
+        }
+
+
+
+        entityData.set(EXTRA,tag);
+    }
+
+    public ListTag getUpgrades()
+    {
+        CompoundTag tag = entityData.get(EXTRA);
+        if(tag.contains("upgrades"))
+        {
+            return (ListTag) tag.get("upgrades");
+        }
+        return null;
+    }
+    public boolean hasUpgrade(String upgrade)
+    {
+        CompoundTag tag = entityData.get(EXTRA);
+        if(tag.contains("upgrades"))
+        {
+            ListTag list = (ListTag) tag.get("upgrades");
+
+            for (int i = 0; i < list.size(); i++) {
+                if(list.getString(i).equals(upgrade))
+                {
+                    return true;
+                }
+            }
+
+        }
+        return false;
     }
 
     public void setEngineOn(boolean on)
