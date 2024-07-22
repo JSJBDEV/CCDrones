@@ -10,6 +10,7 @@ import dan200.computercraft.api.filesystem.MountConstants;
 import dan200.computercraft.api.lua.ILuaAPI;
 import dan200.computercraft.api.lua.LuaFunction;
 import dan200.computercraft.api.lua.MethodResult;
+import dan200.computercraft.core.computer.mainthread.MainThread;
 import dan200.computercraft.core.filesystem.FileSystemException;
 import dan200.computercraft.core.filesystem.FileSystemWrapper;
 import dan200.computercraft.core.util.PeripheralHelpers;
@@ -183,6 +184,15 @@ public class DroneAPI implements ILuaAPI {
         {
             drone.ejectPassengers();
         }
+    }
+
+    @LuaFunction(mainThread = true)
+    public final Map<String, Object> getPos() {
+        Map<String, Object> info = new HashMap<>();
+        info.put("x",drone.position().x);
+        info.put("y",drone.position().y);
+        info.put("z",drone.position().z);
+        return info;
     }
 
 
